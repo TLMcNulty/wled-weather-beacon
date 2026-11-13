@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "WLED Weather Beacon",
+        "description": "Show the hourly forecast on a WLED lamp.",
+        "data": {
+          "host": "WLED lamp IP or hostname",
+          "weather": "Weather entity (needs an hourly forecast)",
+          "hours": "Forecast window (hours)"
+        }
+      }
+    },
+    "error": {"cannot_connect": "Couldn't reach a WLED device at that address."},
+    "abort": {"already_configured": "That lamp already has a weather beacon."}
+  },
+  "entity": {
+    "select": {
+      "style": {"name": "Trend style"},
+      "mode": {"name": "Mode"}
+    },
+    "sensor": {
+      "look": {"name": "Look"},
+      "trend": {"name": "Trend"}
+    }
+  }
+}

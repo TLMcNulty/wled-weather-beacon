@@ -41,9 +41,9 @@ Every `TREND_EVERY` seconds, the lamp compares the temperature at the end of the
 
 | Style | What it does |
 |---|---|
-| `flash` | three hard blinks (default) |
+| `flash` | three hard blinks |
 | `fade` | two slow crossfades to the trend colour and back |
-| `dip` | dims the look, pops the trend colour at full brightness, then dims and returns |
+| `dip` | dims the look, pops the trend colour at full brightness, blinks it rapidly three times, then dims back to the forecast (default) |
 | `overlay` | keeps the effect running and tints its background with the trend colour at 25%; doesn't show on looks that use a WLED palette, such as cloudy |
 | `off` | no trend flash |
 
@@ -51,7 +51,29 @@ Every `TREND_EVERY` seconds, the lamp compares the temperature at the end of the
 
 `MODE=gradient` paints the forecast across every LED instead. The start of the strip is this hour, and each hour blends into the next. It looks nice, but you can't read it at a glance as easily as one look.
 
-## Setup
+## Install as a Home Assistant integration (recommended)
+
+This option works on any Home Assistant install and needs no token or container.
+
+1. **Install it.** Either:
+   - **HACS:** go to HACS → ⋮ → Custom repositories, add this repo's URL with type **Integration**, then install *WLED Weather Beacon*.
+   - **Manually:** copy `custom_components/weather_beacon` into your HA `config/custom_components/` folder.
+2. Restart Home Assistant.
+3. Go to **Settings → Devices & services → Add integration → WLED Weather Beacon**. Enter the lamp's IP, pick a weather entity, and choose the window (default 3 hours).
+
+You get a device with these entities:
+
+| Entity | What it is |
+|---|---|
+| `sensor.…_look` | the weather the lamp is showing. Its attributes hold the WLED effect, plus `ahead`, the next 12 hours of looks and trends, ready for a markdown card |
+| `sensor.…_trend` | `warmer`, `same` or `colder` |
+| `select.…_trend_style` | `dip` (default), `flash`, `fade`, `overlay` or `off`. Changing it previews the style on the lamp. Kept across restarts |
+| `select.…_mode` | `glance` or `gradient` |
+
+The forecast is fetched every 10 minutes, and the trend signal plays every 60 seconds.
+
+## Or run it standalone (Docker)
+
 
 1. In Home Assistant, go to your **Profile → Security → Long-lived access tokens** and create a token named `weather-beacon`.
 2. Find your lamp's IP address. It's in the WLED app, or in HA under the WLED device. Giving it a fixed address in your router helps.
@@ -94,7 +116,7 @@ A style switched with `./style` lasts until the beacon restarts. To keep a style
 | `INTERVAL` | `600` | seconds between forecast fetches |
 | `TREND_EVERY` | `60` | seconds between trend flashes; `0` turns them off |
 | `TREND_DEG` | `3` | change in HA's temperature unit that counts as warmer or colder |
-| `TREND_STYLE` | `flash` | `flash`, `fade`, `dip`, `overlay` or `off` |
+| `TREND_STYLE` | `dip` | `flash`, `fade`, `dip`, `overlay` or `off` |
 | `PORT` | `8080` | status page port inside the container |
 
 ## Notes and gotchas

@@ -70,7 +70,7 @@ def trend(hours):
 
 
 TREND_STYLES = ("flash", "fade", "dip", "overlay")
-style_now = E("TREND_STYLE", "flash")  # changed live by POST /style/<name|next>; "off" pauses the signal
+style_now = E("TREND_STYLE", "dip")  # changed live by POST /style/<name|next>; "off" pauses the signal
 
 
 import threading
@@ -99,7 +99,10 @@ def _blink(rgb, restore, style=None):
         bri = http(f"{w}/json/state")["bri"]
         low = max(bri // 5, 5)
         post({"tt": 5, "bri": low}); time.sleep(0.7)
-        post({"tt": 2, "bri": bri, "seg": solid(rgb)}); time.sleep(1.2)
+        post({"tt": 2, "bri": bri, "seg": solid(rgb)}); time.sleep(0.4)
+        for col in [(0, 0, 0), rgb] * 3:  # rapid blinks of the trend colour
+            post({"tt": 0, "seg": solid(col)}); time.sleep(0.12)
+        time.sleep(0.3)
         post({"tt": 5, "bri": low, "seg": [restore]}); time.sleep(0.7)
         post({"tt": 5, "bri": bri})
     elif style == "overlay":  # effect keeps running; its background fades to the trend colour at 25%
