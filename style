@@ -1,0 +1,4 @@
+#!/bin/sh
+# Switch the running weather beacon's temperature signal: style [flash|fade|dip|overlay|off]  (no argument = next one)
+# Reverts to TREND_STYLE when the beacon restarts. BEACON=http://host:8099 to target another host.
+curl -fsS -X POST "${BEACON:-http://localhost:8099}/style/${1:-next}"

@@ -1,0 +1,11 @@
+services:
+  beacon:
+    image: python:3.13-alpine
+    restart: unless-stopped
+    command: ["python", "-u", "/app/beacon.py"]
+    env_file: .env
+    ports:
+      - "8099:8080" # status page
+    volumes:
+      - ./beacon.py:/app/beacon.py:ro
+      - /etc/localtime:/etc/localtime:ro # status page shows local times
