@@ -2,15 +2,15 @@
   "domain": "weather_beacon",
   "name": "WLED Weather Beacon",
   "codeowners": [
-    "@OWNER"
+    "@TLMcNulty"
   ],
   "config_flow": true,
   "dependencies": [
     "weather"
   ],
-  "documentation": "https://github.com/OWNER/wled-weather-beacon",
+  "documentation": "https://github.com/TLMcNulty/wled-weather-beacon",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/OWNER/wled-weather-beacon/issues",
+  "issue_tracker": "https://github.com/TLMcNulty/wled-weather-beacon/issues",
   "requirements": [],
   "version": "0.1.0-beta.1"
 }
