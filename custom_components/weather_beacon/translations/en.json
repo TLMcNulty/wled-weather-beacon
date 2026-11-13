@@ -15,6 +15,9 @@
     "abort": {"already_configured": "That lamp already has a weather beacon."}
   },
   "entity": {
+    "number": {
+      "trend_every": {"name": "Trend signal interval"}
+    },
     "select": {
       "style": {"name": "Trend style"},
       "mode": {"name": "Mode"}

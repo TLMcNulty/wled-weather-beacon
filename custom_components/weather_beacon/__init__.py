@@ -2,6 +2,7 @@
 import asyncio
 from datetime import timedelta
 import logging
+import time
 
 import aiohttp
 
@@ -12,11 +13,12 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.start import async_at_started
 
 from .looks import MODES, TREND, TREND_STYLES, glance_seg, gradient, pick, trend
 
 DOMAIN = "weather_beacon"
-PLATFORMS = [Platform.SELECT, Platform.SENSOR]
+PLATFORMS = [Platform.NUMBER, Platform.SELECT, Platform.SENSOR]
 FORECAST_EVERY, TREND_EVERY = timedelta(minutes=10), timedelta(seconds=60)
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ class Beacon:
         self.session = async_get_clientsession(hass)
         self.style, self.mode = TREND_STYLES[0], MODES[0]  # overwritten by the restored select entities
         self.full, self.last, self.lock = [], None, asyncio.Lock()
+        self.trend_minutes, self.last_blink = 1, 0.0  # minutes overwritten by the restored number entity
         self.signal = f"{DOMAIN}_{entry.entry_id}"
         self.device = DeviceInfo(identifiers={(DOMAIN, entry.entry_id)}, name=entry.title, manufacturer="WLED Weather Beacon")
 
@@ -65,13 +68,17 @@ class Beacon:
             async with self.lock:
                 await self.wled("state", {"seg": [seg]})
             self.last = seg
+            _LOGGER.debug("look -> %s (%s) for %s", conds, self.mode, self.host)
 
-    async def pulse(self, *_):
-        """The periodic warmer/same/colder signal."""
+    async def pulse(self, now=None, force=False):
+        """The warmer/same/colder signal: every trend_minutes, or now when force (a style preview)."""
         if self.last is None:
             return await self.refresh()  # lamp was off or never painted: check every round so it lights up promptly
         if self.style == "off":
             return
+        if not force and time.monotonic() - self.last_blink < self.trend_minutes * 60 - 5:  # 5 s slack for timer jitter
+            return
+        self.last_blink = time.monotonic()
         try:
             async with self.lock:
                 await self.blink(TREND[trend(self.full[:self.hours])], self.last)
@@ -112,7 +119,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)  # restores the selects before the first paint
     entry.async_on_unload(async_track_time_interval(hass, beacon.refresh, FORECAST_EVERY))
     entry.async_on_unload(async_track_time_interval(hass, beacon.pulse, TREND_EVERY))
-    entry.async_create_background_task(hass, beacon.refresh(), f"{DOMAIN} first refresh")
+    # the weather entity may not exist until HA has finished starting; runs at once if HA is already up
+    entry.async_on_unload(async_at_started(hass, lambda _: entry.async_create_background_task(
+        hass, beacon.refresh(), f"{DOMAIN} first refresh")))
     return True
 
 

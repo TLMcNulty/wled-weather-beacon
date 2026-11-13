@@ -69,8 +69,9 @@ You get a device with these entities:
 | `sensor.…_trend` | `warmer`, `same` or `colder` |
 | `select.…_trend_style` | `dip` (default), `flash`, `fade`, `overlay` or `off`. Changing it previews the style on the lamp. Kept across restarts |
 | `select.…_mode` | `glance` or `gradient` |
+| `number.…_trend_signal_interval` | minutes between trend signals, 1–60 (default 1). It's on the device page under *Configuration* and kept across restarts |
 
-The forecast is fetched every 10 minutes, and the trend signal plays every 60 seconds.
+The forecast is fetched every 10 minutes. The trend signal plays every *Trend signal interval* minutes. Changing the trend style always previews it straight away.
 
 ## Or run it standalone (Docker)
 
@@ -91,6 +92,28 @@ The forecast is fetched every 10 minutes, and the trend signal plays every 60 se
 6. Open the status page at `http://<host>:8099`.
 
 The beacon leaves the lamp alone while it's off. Turn the lamp on and it picks up the forecast look within a minute.
+
+## Testing the beta
+
+This is a test release, and feedback is very welcome.
+
+1. **Get beta versions:** in HACS, open *WLED Weather Beacon* → ⋮ → **Redownload**, and turn on **Show beta versions**. Updates then appear as an update badge; install them and restart HA.
+2. **Turn on debug logging** so you can see what the beacon tells the lamp:
+   ```yaml
+   logger:
+     logs:
+       custom_components.weather_beacon: debug
+   ```
+3. **Report problems** with the *Bug report* issue template. It asks for:
+   - your Home Assistant, WLED and weather-integration versions
+   - the Look and Trend sensor states
+   - the log lines
+
+**Known limits:**
+- **Forecast:** it needs a weather entity with an **hourly** forecast. met.no, Home Assistant's default, has one; some integrations only offer daily forecasts.
+- **Segments:** only the lamp's first WLED segment is used, and the beacon replaces whatever effect the lamp was running.
+- **Tested so far:** a 24-LED strip only. Large strips (over about 1,000 LEDs) and 2D matrices are untested, especially in gradient mode.
+- **Older Home Assistant:** not yet tested before 2026.10.
 
 ## Tuning and demos
 

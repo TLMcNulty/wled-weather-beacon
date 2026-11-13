@@ -1,0 +1,56 @@
+name: Bug report
+description: Something the beacon did wrong or didn't do
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: ha
+    attributes:
+      label: Home Assistant version and install type
+      placeholder: 2026.10.2, Container / OS / Supervised / Core
+    validations:
+      required: true
+  - type: input
+    id: beacon
+    attributes:
+      label: Weather Beacon version, and how it's installed
+      placeholder: 0.1.0-beta.1 via HACS / manual / standalone Docker
+    validations:
+      required: true
+  - type: input
+    id: wled
+    attributes:
+      label: WLED version, controller and LED count
+      placeholder: 0.15.4, ESP32-C3, 24 LEDs, strip (not matrix)
+    validations:
+      required: true
+  - type: input
+    id: weather
+    attributes:
+      label: Weather integration used for the forecast
+      placeholder: Met.no / OpenWeatherMap / ...
+    validations:
+      required: true
+  - type: textarea
+    id: state
+    attributes:
+      label: Look and Trend sensor states
+      description: Developer tools → States → the beacon's `sensor.…_look` (with its attributes) and `sensor.…_trend`.
+      render: yaml
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Turn on debug logging, reproduce, then paste lines mentioning weather_beacon:
+        ```yaml
+        logger:
+          logs:
+            custom_components.weather_beacon: debug
+        ```
+      render: text

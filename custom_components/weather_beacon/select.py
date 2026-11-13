@@ -33,4 +33,4 @@ class BeaconSelect(SelectEntity, RestoreEntity):
         if self.key == "mode":
             await self.b.paint()
         elif self.b.last is not None:  # preview the new style now instead of waiting for the next round
-            self.hass.async_create_task(self.b.pulse())
+            self.hass.async_create_task(self.b.pulse(force=True))
