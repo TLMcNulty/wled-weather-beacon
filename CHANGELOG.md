@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-beta.2
+
+- **Summary** sensor: one line for a dashboard tile (look · trend · what the lamp is showing, e.g. `Clear, night · Same · Twinkle white`); its icon follows the look, and it follows the lamp's WLED light live.
+- **Look** and **Trend** are enum sensors with display names (`Clear, night`, `Colder`); the stored states are unchanged, so automations keep working. **Trend style** and **Mode** options are capitalised too.
+- Follows a lamp that gets a new IP address (WLED zeroconf announcement, matched by MAC).
+- Repaints the look when the lamp comes back after losing power.
+- Cloudy look: Candle Multi on the Cloud palette.
+- Fixed: the first refresh after Home Assistant starts no longer fails; the sensors used to read unknown for about a minute.
+- Removed the GitHub Actions workflow.
+
 ## 0.1.0-beta.1
 
 The first test release.

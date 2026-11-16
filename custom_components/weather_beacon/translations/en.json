@@ -11,20 +11,71 @@
         }
       }
     },
-    "error": {"cannot_connect": "Couldn't reach a WLED device at that address."},
-    "abort": {"already_configured": "That lamp already has a weather beacon."}
+    "error": {
+      "cannot_connect": "Couldn't reach a WLED device at that address."
+    },
+    "abort": {
+      "already_configured": "That lamp already has a weather beacon.",
+      "not_beacon": "This WLED device isn't set up as a weather beacon."
+    }
   },
   "entity": {
     "number": {
-      "trend_every": {"name": "Trend signal interval"}
+      "trend_every": {
+        "name": "Trend signal interval"
+      }
     },
     "select": {
-      "style": {"name": "Trend style"},
-      "mode": {"name": "Mode"}
+      "style": {
+        "name": "Trend style",
+        "state": {
+          "dip": "Dip",
+          "flash": "Flash",
+          "fade": "Fade",
+          "overlay": "Overlay",
+          "off": "Off"
+        }
+      },
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "glance": "Glance",
+          "gradient": "Gradient"
+        }
+      }
     },
     "sensor": {
-      "look": {"name": "Look"},
-      "trend": {"name": "Trend"}
+      "look": {
+        "name": "Look",
+        "state": {
+          "clear-night": "Clear, night",
+          "cloudy": "Cloudy",
+          "exceptional": "Exceptional",
+          "fog": "Fog",
+          "hail": "Hail",
+          "lightning": "Lightning",
+          "lightning-rainy": "Lightning, rainy",
+          "partlycloudy": "Partly cloudy",
+          "pouring": "Pouring",
+          "rainy": "Rainy",
+          "snowy": "Snowy",
+          "snowy-rainy": "Snowy, rainy",
+          "sunny": "Sunny",
+          "windy": "Windy",
+          "windy-variant": "Windy, cloudy"
+        }
+      },
+      "trend": {
+        "name": "Trend",
+        "state": {
+          "warmer": "Warmer",
+          "same": "Same",
+          "colder": "Colder"
+        }
+      },
+      "summary": {
+        "name": "Summary"
+      }
     }
   }
 }

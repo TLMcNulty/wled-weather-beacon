@@ -8,7 +8,7 @@ import aiohttp
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -49,6 +49,7 @@ class Beacon:
             async_dispatcher_send(self.hass, self.signal)
             await self.paint()
         except Exception as e:  # HA weather or lamp offline: log and retry next round
+            self.last = None  # the lamp may have lost power and rebooted to its own preset: repaint once it answers
             _LOGGER.warning("weather beacon refresh failed: %s", e)
 
     async def paint(self):
@@ -83,6 +84,7 @@ class Beacon:
             async with self.lock:
                 await self.blink(TREND[trend(self.full[:self.hours])], self.last)
         except Exception as e:
+            self.last = None  # as in refresh: repaint the look when the lamp is back
             _LOGGER.warning("weather beacon trend signal failed: %s", e)
 
     async def blink(self, rgb, restore):
@@ -120,8 +122,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(async_track_time_interval(hass, beacon.refresh, FORECAST_EVERY))
     entry.async_on_unload(async_track_time_interval(hass, beacon.pulse, TREND_EVERY))
     # the weather entity may not exist until HA has finished starting; runs at once if HA is already up
-    entry.async_on_unload(async_at_started(hass, lambda _: entry.async_create_background_task(
-        hass, beacon.refresh(), f"{DOMAIN} first refresh")))
+    # @callback: a plain lambda is run in a worker thread, where creating the task fails
+    entry.async_on_unload(async_at_started(hass, callback(lambda _: entry.async_create_background_task(
+        hass, beacon.refresh(), f"{DOMAIN} first refresh"))))
     return True
 
 
