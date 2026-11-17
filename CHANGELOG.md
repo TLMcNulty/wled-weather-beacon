@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-beta.3
+
+- The trend now shows where the temperature heads over the next 12 hours: the first hour `TREND_DEG` or more away from now (the next peak or trough) sets warmer or colder; smaller wiggles read as same. It used to compare only the ends of the look window. The `ahead` timeline uses the same rule.
+
 ## 0.1.0-beta.2
 
 - **Summary** sensor: one line for a dashboard tile (look · trend · what the lamp is showing, e.g. `Clear, night · Same · Twinkle white`); its icon follows the look, and it follows the lamp's WLED light live.

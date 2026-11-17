@@ -26,6 +26,7 @@ GLANCE = [
     ({"sunny"}, "Solid", "* Colors 1&2", [(255, 150, 0), (0, 0, 0)], 128, 128),
 ]
 TREND_EVERY, TREND_DEG = int(E("TREND_EVERY", "60")), float(E("TREND_DEG", "3"))  # degrees in HA's temperature unit
+TREND_HOURS = 12  # how far ahead the trend looks; independent of the look window
 TREND = {"warmer": (255, 0, 0), "same": (0, 255, 0), "colder": (0, 60, 255)}  # red/green/blue; green = no change, as on the original Weatherball
 # HA's catch-all "exceptional" (not an alert) or a condition HA adds later: slow red blink = "beacon can't tell"
 UNKNOWN = ({"exceptional"}, "Blink", "* Colors 1&2", [(255, 0, 0), (0, 0, 0)], 60, 128)
@@ -65,7 +66,11 @@ def forecast():
 
 
 def trend(hours):
-    d = hours[-1]["temperature"] - hours[0]["temperature"]
+    """Where the temperature heads next, from an hourly forecast starting now.
+    The first hour within TREND_HOURS that is TREND_DEG or more away from now gives the direction: the climb to the
+    next peak or the drop to the next trough. Wiggles smaller than TREND_DEG never count; a short forecast uses what it has."""
+    now = hours[0]["temperature"]
+    d = next((h["temperature"] - now for h in hours[1:TREND_HOURS + 1] if abs(h["temperature"] - now) >= TREND_DEG), 0)
     return "warmer" if d >= TREND_DEG else "colder" if d <= -TREND_DEG else "same"
 
 
@@ -123,7 +128,7 @@ def ahead(n=12):
     for i in range(min(n, max(len(full) - HOURS + 1, 0))):
         conds = [h["condition"] for h in full[i:i + HOURS]]
         row = pick(conds)
-        out.append((full[i], row, trend(full[i:i + HOURS]), next((c for c in conds if c in row[0]), "unknown")))
+        out.append((full[i], row, trend(full[i:]), next((c for c in conds if c in row[0]), "unknown")))
     return out
 
 
@@ -175,7 +180,7 @@ def serve():
             style_now = cycle[(cycle.index(style_now) + 1) % len(cycle)] if name == "next" else name
             print("trend style ->", style_now, flush=True)
             if last and hours and style_now != "off":  # preview it now instead of waiting for the next round
-                threading.Thread(target=blink, args=(TREND[trend(hours)], last), daemon=True).start()
+                threading.Thread(target=blink, args=(TREND[trend(full)], last), daemon=True).start()
             self.send_response(200); self.end_headers(); self.wfile.write(f"{style_now}\n".encode())
 
         def do_GET(self):
@@ -198,7 +203,7 @@ def tick():
     hours = full[:HOURS]
     conds = [h["condition"] for h in hours]
     if E("DRY_RUN"):
-        return print(conds, "->", pick(conds)[1:], "| trend:", trend(hours), [h["temperature"] for h in hours],
+        return print(conds, "->", pick(conds)[1:], "| trend:", trend(full), [h["temperature"] for h in hours],
                      "| gradient:", gradient(conds, 6))
     w = f"http://{E('WLED_HOST')}"
     if not http(f"{w}/json/state")["on"]:
@@ -219,6 +224,7 @@ def tick():
 assert gradient(["sunny", "rainy"], 2) == ["FF9600", "006EFF"] and gradient(["fog"], 3) == ["6E6E6E"] * 3
 assert pick(["cloudy", "rainy", "sunny"])[1] == "Rain" and pick(["sunny"])[1] == "Solid" and pick(["new"]) is UNKNOWN
 assert [trend([{"temperature": 40}, {"temperature": t}]) for t in (44, 41, 36)] == ["warmer", "same", "colder"]
+assert trend([{"temperature": t} for t in (40, 42, 44, 41, 35)]) == "warmer"  # the first peak/trough wins
 
 if sys.argv[1:2] == ["demo-blend"]:  # each TREND_STYLE with one trend colour, 5 s apart
     tick()
@@ -254,7 +260,7 @@ while True:
             tick()
             next_fetch = time.time() + INTERVAL
         elif last and TREND_EVERY and style_now != "off":  # last is None while the lamp is off
-            blink(TREND[trend(hours)], last)
+            blink(TREND[trend(full)], last)
     except Exception as e:  # lamp or HA offline: log and retry next round
         print("error:", e, file=sys.stderr, flush=True)
         next_fetch = time.time() + TREND_EVERY

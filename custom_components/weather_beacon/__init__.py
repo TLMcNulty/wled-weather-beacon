@@ -82,7 +82,7 @@ class Beacon:
         self.last_blink = time.monotonic()
         try:
             async with self.lock:
-                await self.blink(TREND[trend(self.full[:self.hours])], self.last)
+                await self.blink(TREND[trend(self.full)], self.last)
         except Exception as e:
             self.last = None  # as in refresh: repaint the look when the lamp is back
             _LOGGER.warning("weather beacon trend signal failed: %s", e)

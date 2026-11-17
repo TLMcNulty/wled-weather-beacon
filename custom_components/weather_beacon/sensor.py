@@ -62,7 +62,7 @@ class TrendSensor(BeaconSensor):
 
     @property
     def native_value(self):
-        return trend(self.window) if self.window else None
+        return trend(self.b.full) if self.b.full else None
 
 
 # shortcut: English only; the Look/Trend sensors stay translatable. Move these into translations if the summary text needs other languages.
@@ -118,7 +118,7 @@ class SummarySensor(BeaconSensor):
             return None
         look = LOOK_NAMES.get(self._look, "Unknown")
         lamp = lamp_text(self.hass.states.get(self.light) if self.light else None)
-        return f"{look} · {trend(self.window).capitalize()} · {lamp}"
+        return f"{look} · {trend(self.b.full).capitalize()} · {lamp}"
 
     @property
     def icon(self):
