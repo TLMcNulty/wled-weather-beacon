@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-beta.4
+
+- The trend looks 8 hours ahead instead of 12, so it follows the next swing rather than one later in the day.
+
 ## 0.1.0-beta.3
 
 - The trend now shows where the temperature heads over the next 12 hours: the first hour `TREND_DEG` or more away from now (the next peak or trough) sets warmer or colder; smaller wiggles read as same. It used to compare only the ends of the look window. The `ahead` timeline uses the same rule.

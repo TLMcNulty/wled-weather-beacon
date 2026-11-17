@@ -26,7 +26,7 @@ GLANCE = [
     ({"sunny"}, "Solid", "* Colors 1&2", [(255, 150, 0), (0, 0, 0)], 128, 128),
 ]
 TREND_EVERY, TREND_DEG = int(E("TREND_EVERY", "60")), float(E("TREND_DEG", "3"))  # degrees in HA's temperature unit
-TREND_HOURS = 12  # how far ahead the trend looks; independent of the look window
+TREND_HOURS = 8  # how far ahead the trend looks; independent of the look window
 TREND = {"warmer": (255, 0, 0), "same": (0, 255, 0), "colder": (0, 60, 255)}  # red/green/blue; green = no change, as on the original Weatherball
 # HA's catch-all "exceptional" (not an alert) or a condition HA adds later: slow red blink = "beacon can't tell"
 UNKNOWN = ({"exceptional"}, "Blink", "* Colors 1&2", [(255, 0, 0), (0, 0, 0)], 60, 128)

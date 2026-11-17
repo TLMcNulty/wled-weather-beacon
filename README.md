@@ -31,7 +31,7 @@ All of these live in the `GLANCE` table at the top of `beacon.py`, one line per 
 
 ### Temperature trend
 
-Every `TREND_EVERY` seconds, the lamp flashes where the temperature heads next. It looks up to 12 hours ahead (`TREND_HOURS`, separate from the look window) for the first hour that is `TREND_DEG` or more away from now: the climb to the next peak or the drop to the next trough. Smaller wiggles don't count.
+Every `TREND_EVERY` seconds, the lamp flashes where the temperature heads next. It looks up to 8 hours ahead (`TREND_HOURS`, separate from the look window) for the first hour that is `TREND_DEG` or more away from now: the climb to the next peak or the drop to the next trough. Smaller wiggles don't count.
 
 - **Red:** warmer (by `TREND_DEG` or more)
 - **Green:** about the same

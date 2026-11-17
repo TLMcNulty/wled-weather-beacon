@@ -20,7 +20,7 @@ UNKNOWN = ({"exceptional"}, "Blink", "* Colors 1&2", [(255, 0, 0), (0, 0, 0)], 6
 COLORS = {c: fg for conds, _, _, (fg, _), *_ in GLANCE for c in conds}  # gradient mode uses each look's main colour
 TREND = {"warmer": (255, 0, 0), "same": (0, 255, 0), "colder": (0, 60, 255)}
 TREND_DEG = 3  # change in HA's temperature unit that counts as warmer/colder
-TREND_HOURS = 12  # how far ahead the trend looks; independent of the look window
+TREND_HOURS = 8  # how far ahead the trend looks; independent of the look window
 TREND_STYLES = ["dip", "flash", "fade", "overlay", "off"]  # first = default
 MODES = ["glance", "gradient"]
 
@@ -79,5 +79,5 @@ assert [T(40, t) for t in (44, 41, 36)] == ["warmer", "same", "colder"]
 assert T(40, 41, 42, 43, 44) == "warmer"  # steady rise
 assert T(40, 42, 44, 41, 35, 30) == "warmer" and T(40, 38, 36, 39, 45) == "colder"  # the first peak/trough wins
 assert T(40, 42, 39, 41, 38, 42) == "same"  # wiggle under TREND_DEG
-assert T(*[40] * (TREND_HOURS + 1), 50) == "same" and T(*[40] * TREND_HOURS, 50) == "warmer"  # 50 is 13 h vs 12 h out
+assert T(*[40] * (TREND_HOURS + 1), 50) == "same" and T(*[40] * TREND_HOURS, 50) == "warmer"  # 50 just past vs at the horizon
 assert T(40) == "same" and T(40, 37) == "colder"  # forecast shorter than the horizon
